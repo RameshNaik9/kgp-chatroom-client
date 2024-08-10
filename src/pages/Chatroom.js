@@ -118,6 +118,12 @@ function Chatroom() {
 
     return (
         <div className={`chatroom-container bg-${theme}`}>
+            <div className="d-flex justify-content-between align-items-center p-3 border-bottom">
+                <h2 className="m-0">Chatroom</h2>
+                <button className="btn btn-outline-primary" onClick={toggleTheme}>
+                    Switch to {theme === 'light' ? 'Dark' : 'Light'} Theme
+                </button>
+            </div>
             <div className={`overlay ${isConnected ? 'd-none' : 'd-flex'}`}>
                 <div className="overlay-content">
                     <div className="spinner-border text-primary" role="status">
