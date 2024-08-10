@@ -7,6 +7,7 @@
     height: 100vh;
     display: flex;
     flex-direction: column;
+    position: relative;
 }
 
 .messages {
@@ -40,4 +41,25 @@
 .text-danger {
     color: red;
     margin-top: 5px;
+}
+
+.overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(255, 255, 255, 0.8);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    z-index: 10;
+}
+
+.overlay-content {
+    text-align: center;
+}
+
+.blur {
+    filter: blur(4px);
 }

@@ -4,7 +4,9 @@ import axios from 'axios';
 
 function Chatroom() {
     const [message, setMessage] = useState('');
-    const [messages, setMessages] = useState([]);
+    const [messages, setMessages] = useState(JSON.parse(localStorage.getItem('messages')) || []);
+    const [isLoading, setIsLoading] = useState(true); // Loading state
+    const [isConnected, setIsConnected] = useState(true); // Connection state
     const [theme, setTheme] = useState('light'); // State for theme
     const socket = io('http://localhost:8080', {
         withCredentials: true,
@@ -17,26 +19,47 @@ function Chatroom() {
     useEffect(() => {
         // Fetch chat history
         const fetchMessages = async () => {
-            const response = await axios.get('http://localhost:8080/api/chat/history', {
-                headers: {
-                    Authorization: `Bearer ${localStorage.getItem('token')}`,
-                },
-            });
-            setMessages(response.data);
+            try {
+                const response = await axios.get('http://localhost:8080/api/chat/history', {
+                    headers: {
+                        Authorization: `Bearer ${localStorage.getItem('token')}`,
+                    },
+                });
+                setMessages(response.data);
+                localStorage.setItem('messages', JSON.stringify(response.data)); // Cache messages
+                setIsLoading(false); // Successfully loaded messages
+            } catch (error) {
+                console.error('Error fetching messages:', error.message);
+                setIsConnected(false); // Set connection state to false if error occurs
+            }
         };
-        fetchMessages();
+
+        if (isConnected) {
+            fetchMessages();
+        }
 
         // Listen for new messages
         socket.on('chatMessage', (msg) => {
             setMessages((prevMessages) => {
-                return prevMessages.map(m => m.localId === msg.localId ? { ...m, status: 'delivered' } : m);
+                const updatedMessages = prevMessages.map(m => m.localId === msg.localId ? { ...m, status: 'delivered' } : m);
+                localStorage.setItem('messages', JSON.stringify(updatedMessages)); // Cache updated messages
+                return updatedMessages;
             });
+        });
+
+        socket.on('connect', () => {
+            setIsConnected(true);
+            setIsLoading(false);
+        });
+
+        socket.on('disconnect', () => {
+            setIsConnected(false);
         });
 
         return () => {
             socket.disconnect();
         };
-    }, []);
+    }, [isConnected]);
 
     const handleSendMessage = (e) => {
         e.preventDefault();
@@ -57,24 +80,32 @@ function Chatroom() {
             status: 'sending' // Initial status is 'sending'
         };
 
-        setMessages((prevMessages) => [...prevMessages, newMessage]);
+        setMessages((prevMessages) => {
+            const updatedMessages = [...prevMessages, newMessage];
+            localStorage.setItem('messages', JSON.stringify(updatedMessages)); // Cache updated messages
+            return updatedMessages;
+        });
 
         // Send message to the server and handle potential errors
         socket.emit('chatMessage', { userId, message, localId }, (response) => {
             if (response.status === 'ok') {
                 // Message delivered successfully, update status
-                setMessages((prevMessages) =>
-                    prevMessages.map((m) =>
+                setMessages((prevMessages) => {
+                    const updatedMessages = prevMessages.map((m) =>
                         m.localId === localId ? { ...m, status: 'delivered' } : m
-                    )
-                );
+                    );
+                    localStorage.setItem('messages', JSON.stringify(updatedMessages)); // Cache updated messages
+                    return updatedMessages;
+                });
             } else {
                 // Server responded with an error, mark as failed
-                setMessages((prevMessages) =>
-                    prevMessages.map((m) =>
+                setMessages((prevMessages) => {
+                    const updatedMessages = prevMessages.map((m) =>
                         m.localId === localId ? { ...m, status: 'failed' } : m
-                    )
-                );
+                    );
+                    localStorage.setItem('messages', JSON.stringify(updatedMessages)); // Cache updated messages
+                    return updatedMessages;
+                });
             }
         });
 
@@ -87,13 +118,15 @@ function Chatroom() {
 
     return (
         <div className={`chatroom-container bg-${theme}`}>
-            <div className="d-flex justify-content-between align-items-center p-3 border-bottom">
-                <h2 className="m-0">Chatroom</h2>
-                <button className="btn btn-outline-primary" onClick={toggleTheme}>
-                    Switch to {theme === 'light' ? 'Dark' : 'Light'} Theme
-                </button>
+            <div className={`overlay ${isConnected ? 'd-none' : 'd-flex'}`}>
+                <div className="overlay-content">
+                    <div className="spinner-border text-primary" role="status">
+                        <span className="visually-hidden">Loading...</span>
+                    </div>
+                    <p>Connecting to server...</p>
+                </div>
             </div>
-            <div className="messages p-3" style={{ height: '70vh', overflowY: 'scroll' }}>
+            <div className={`messages p-3 ${isLoading ? 'blur' : ''}`} style={{ height: '70vh', overflowY: 'scroll' }}>
                 {messages.map((msg, index) => {
                     const token = localStorage.getItem('token');
                     const decodedToken = JSON.parse(atob(token.split('.')[1])); // Decode the JWT token
