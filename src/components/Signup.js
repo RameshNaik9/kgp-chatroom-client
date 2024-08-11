@@ -2,26 +2,34 @@
 import React, { useState } from 'react';
 import axios from 'axios';
 import '../Styles/Login.css'
+import { useNavigate } from 'react-router-dom';
+
 function Signup() {
     const [rollNumber, setRollNumber] = useState('');
     const [department, setDepartment] = useState('');
     const [fullName, setFullName] = useState('');
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
+    const navigate = useNavigate();
 
     const handleSignup = async (e) => {
         e.preventDefault();
         try {
-            await axios.post('http://localhost:8080/api/auth/register', {
+            const response =await axios.post('http://localhost:8080/api/auth/register', {
                 rollNumber,
                 department,
                 fullName,
                 email,
                 password,
             });
-            // Handle successful signup
+            if(response){
+                navigate('/login');
+            }else{
+                alert('Signup failed');
+            }
         } catch (error) {
             console.error('Signup failed:', error.message);
+            alert('Signup failed.');
         }
     };
 
