@@ -1,7 +1,6 @@
-
 import React, { useState } from 'react';
 import axios from 'axios';
-import '../Styles/Login.css'
+import '../Styles/Login.css';
 import { useNavigate } from 'react-router-dom';
 
 function Signup() {
@@ -15,7 +14,7 @@ function Signup() {
     const handleSignup = async (e) => {
         e.preventDefault();
         try {
-            const response =await axios.post('http://localhost:8080/api/auth/register', {
+            const response = await axios.post(`${process.env.REACT_APP_API_BASE_URL}/api/auth/register`, {
                 rollNumber,
                 department,
                 fullName,
@@ -35,7 +34,6 @@ function Signup() {
 
     return (
         <div className="signup-container">
-            {/* <h2>Signup</h2> */}
             <form onSubmit={handleSignup}>
                 <input
                     type="text"

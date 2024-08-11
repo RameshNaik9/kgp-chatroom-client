@@ -8,11 +8,12 @@ function ChatroomComponent() {
     const [isLoading, setIsLoading] = useState(true); // Loading state
     const [isConnected, setIsConnected] = useState(true); // Connection state
     const [theme, setTheme] = useState('light'); // State for theme
-    const socket = io('http://localhost:8080', {
+    
+    const socket = io(process.env.REACT_APP_SOCKET_URL, {
         withCredentials: true,
         transports: ['websocket'],  // Force WebSocket transport
         extraHeaders: {
-            "Access-Control-Allow-Origin": "http://localhost:3000"
+            "Access-Control-Allow-Origin": process.env.REACT_APP_CLIENT_URL
         }
     });
 
@@ -20,7 +21,7 @@ function ChatroomComponent() {
         // Fetch chat history
         const fetchMessages = async () => {
             try {
-                const response = await axios.get('http://localhost:8080/api/chat/history', {
+                const response = await axios.get(`${process.env.REACT_APP_API_BASE_URL}/api/chat/history`, {
                     headers: {
                         Authorization: `Bearer ${localStorage.getItem('token')}`,
                     },
