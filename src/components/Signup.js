@@ -1,14 +1,13 @@
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';  // Use useNavigate instead of useHistory
-import axios from 'axios';
 
+import React, { useState } from 'react';
+import axios from 'axios';
+import '../Styles/Login.css'
 function Signup() {
     const [rollNumber, setRollNumber] = useState('');
     const [department, setDepartment] = useState('');
     const [fullName, setFullName] = useState('');
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
-    const navigate = useNavigate();  // Use useNavigate instead of useHistory
 
     const handleSignup = async (e) => {
         e.preventDefault();
@@ -20,7 +19,7 @@ function Signup() {
                 email,
                 password,
             });
-            navigate('/login');  // Use navigate instead of history.push
+            // Handle successful signup
         } catch (error) {
             console.error('Signup failed:', error.message);
         }
@@ -28,7 +27,7 @@ function Signup() {
 
     return (
         <div className="signup-container">
-            <h2>Signup</h2>
+            {/* <h2>Signup</h2> */}
             <form onSubmit={handleSignup}>
                 <input
                     type="text"

@@ -1,11 +1,11 @@
+
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';  // Use useNavigate instead of useHistory
 import axios from 'axios';
+import '../Styles/Login.css'
 
 function Login() {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
-    const navigate = useNavigate();  // Use useNavigate instead of useHistory
 
     const handleLogin = async (e) => {
         e.preventDefault();
@@ -15,7 +15,7 @@ function Login() {
                 password,
             });
             localStorage.setItem('token', response.data.token);
-            navigate('/chatroom');  // Use navigate instead of history.push
+            // Handle successful login
         } catch (error) {
             console.error('Login failed:', error.message);
         }
@@ -23,7 +23,7 @@ function Login() {
 
     return (
         <div className="login-container">
-            <h2>Login</h2>
+            {/* <h2>Login</h2> */}
             <form onSubmit={handleLogin}>
                 <input
                     type="email"
