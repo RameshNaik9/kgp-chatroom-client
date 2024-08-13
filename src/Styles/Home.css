@@ -1,8 +1,29 @@
 .container {
     height: 100vh; /* Full viewport height */
+    width: 100vw; /* Full viewport width */
     display: flex;
     justify-content: center; /* Center horizontally */
     align-items: center; /* Center vertically */
+    max-width: 100%; /* Override Bootstrap's max-width */
+    padding: 0; /* Remove any padding */
+    margin: 0; /* Remove any margin */
+    position: relative; /* Set position relative for pseudo-element positioning */
+    overflow: auto; /* Add scrollbar if content overflows */
+}
+
+.container::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-image: url('../Images/images2.jpeg');
+    background-size: cover;
+    background-position: center;
+    filter: blur(var(--blur-amount, 13px)); /* Default to 13px if variable isn't set */
+    z-index: -1; /* Ensure the blurred background is behind the content */
+    transition: filter 0.3s ease; /* Smooth transition for blur effect */
 }
 
 .row {
@@ -11,27 +32,36 @@
     justify-content: center;
     align-items: center;
     width: 100%;
+    z-index: 1; /* Make sure content is above the blurred background */
+    padding: 10px;
 }
 
 .col {
-    flex: 1;
-    max-width: 500px; /* Adjust max width as needed */
-    margin: 10px; /* Space between columns */
+    flex: 1 1 auto;
+    max-width: 800px;
+    margin: 20px;
+    background-color: rgba(197, 180, 180, 0.9); /* White background with slight transparency */
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 2px 1px rgba(0, 0, 0, 3); /* Soft shadow around the content */
+    z-index: 1;
 }
 
 .text-center {
     text-align: center;
     position: relative;
+    z-index: 1; /* Ensure text is above the background */
 }
 
 .typing-text {
-    font-size: 24px;
+    font-size: 35px;
     font-weight: bold;
-    color: #333;
+    color: #821f1f;
     overflow: hidden; /* Ensure that the text is hidden until revealed */
     white-space: nowrap; /* Keep the text on a single line */
     border-right: 3px solid #333; /* Cursor effect */
-    animation: typing 6s steps(30, end) infinite, blink-caret 0.75s step-end infinite;
+    animation: typing 6s steps(40, end) infinite, blink-caret 0.75s step-end infinite;
+    z-index: 1;
 }
 
 @keyframes typing {
@@ -46,17 +76,82 @@
 }
 
 .btn {
-    width: 150px; /* Fixed width for buttons */
+    width: 100%; /* Make the buttons take full width of their parent container */
+    max-width: 150px; /* Set a maximum width to prevent them from becoming too large */
     padding: 10px;
     font-size: 16px;
+    z-index: 1;
+    box-sizing: border-box; /* Ensure padding doesn't affect the width */
+    margin: 5px auto; /* Center the buttons with auto margins */
+    display: block; /* Ensure buttons are displayed as block elements */
+}
+
+@media (max-width: 768px) {
+    .btn {
+        max-width: 140px; /* Reduce max width on smaller screens */
+        font-size: 14px; /* Adjust font size for smaller screens */
+    }
+}
+
+
+.btn:hover {
+    color: #fff;
+    transform: scale(1.10); /* Slightly enlarges the button on hover */
 }
 
 .card {
     width: 100%;
-    max-width: 400px; /* Ensure card doesn't get too wide */
-    margin: 0 auto;
+    max-width: 600px; /* Ensure card doesn't get too wide */
+    background-image: url('../Images/image1.jpeg');
+    margin-bottom: 20px;
+    margin-left: 0px;
+    z-index: 1;
+    padding: 10px;
+    margin-left:60px;
 }
 
 .card-body {
-    padding: 20px;
+    padding: 30px;
+    margin-bottom: 20px;
+    z-index: 1;
+    /* margin-left: 70px; */
+}
+
+.card-title {
+    font-size: 25px;
+    color: rgb(48, 170, 133);
+    margin-bottom: 20px;
+    z-index: 1;
+}
+
+.col h3 {
+    color: #821f1f;
+}
+
+/* Responsive styles */
+@media (max-width: 768px) {
+    .typing-text {
+        font-size: 28px; /* Adjust font size for smaller screens */
+    }
+
+    .col {
+        margin: 10px;
+        padding: 15px;
+    }
+
+    .card {
+        margin-left: 0;
+        max-width: 100%;
+    }
+
+    .btn {
+        font-size: 14px; /* Adjust button font size for smaller screens */
+        padding: 8px;
+    }
+}
+.chatbox{
+    display: flex;
+    justify-items: center;
+    align-items: center;
+    margin-left: 100px;
 }

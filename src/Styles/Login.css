@@ -36,7 +36,8 @@
 
 .login-container button:hover,
 .signup-container button:hover {
-    background-color: #0056b3;
+    color: #fff;
+    transform: scale(1.10); 
 }
 
 /* Media Queries for Responsiveness */
@@ -71,3 +72,7 @@
         padding: 8px;
     }
 }
+#form{
+    margin: 20px;
+}
+

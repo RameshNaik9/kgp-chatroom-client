@@ -33,7 +33,7 @@ function Login() {
 
     return (
         <div className="login-container">
-            <form autoComplete="on" onSubmit={handleLogin}>
+            <form autoComplete="on" onSubmit={handleLogin} id="form">
                 <input
                     type="email"
                     id="email"
@@ -52,7 +52,7 @@ function Login() {
                     required
                     autoComplete="current-password"
                 />
-                <button type="submit">Login</button>
+                <button className="my-3" type="submit">Login</button>
             </form>
         </div>
     );

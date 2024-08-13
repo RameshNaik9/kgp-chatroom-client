@@ -34,43 +34,50 @@ function Signup() {
 
     return (
         <div className="signup-container">
-            <form onSubmit={handleSignup}>
-                <input
-                    type="text"
-                    placeholder="Roll Number"
-                    value={rollNumber}
-                    onChange={(e) => setRollNumber(e.target.value)}
-                    required
-                />
-                <input
-                    type="text"
-                    placeholder="Department"
-                    value={department}
-                    onChange={(e) => setDepartment(e.target.value)}
-                    required
-                />
-                <input
+            <form onSubmit={handleSignup} id="form">
+
+            <input
                     type="text"
                     placeholder="Full Name"
+                    id="name"
                     value={fullName}
                     onChange={(e) => setFullName(e.target.value)}
                     required
                 />
-                <input
+            <input
                     type="email"
-                    placeholder="Email"
+                    placeholder=" Institute Email"
+                    id="email"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     required
                 />
                 <input
+                    type="text"
+                    placeholder="Roll Number"
+                    id="rollNumber"
+                    value={rollNumber}
+                    onChange={(e) => setRollNumber(e.target.value)}
+                    required
+                />
+                
+                <input
+                    type="text"
+                    placeholder="Department"
+                    id="department"
+                    value={department}
+                    onChange={(e) => setDepartment(e.target.value)}
+                    required
+                />
+                <input
                     type="password"
                     placeholder="Password"
+                    id="password"
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     required
                 />
-                <button type="submit">Signup</button>
+                <button className=" my-3" type="submit">Signup</button>
             </form>
         </div>
     );

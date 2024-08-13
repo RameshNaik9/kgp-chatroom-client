@@ -1,24 +1,25 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import io from 'socket.io-client';
 import axios from 'axios';
 
 function ChatroomComponent() {
     const [message, setMessage] = useState('');
     const [messages, setMessages] = useState(JSON.parse(localStorage.getItem('messages')) || []);
-    const [isLoading, setIsLoading] = useState(true); // Loading state
-    const [isConnected, setIsConnected] = useState(true); // Connection state
-    const [theme, setTheme] = useState('light'); // State for theme
-    
-    const socket = io(process.env.REACT_APP_SOCKET_URL, {
-        withCredentials: true,
-        transports: ['websocket'],  // Force WebSocket transport
-        extraHeaders: {
-            "Access-Control-Allow-Origin": process.env.REACT_APP_CLIENT_URL
-        }
-    });
+    const [isConnected, setIsConnected] = useState(true);
+    const [theme, setTheme] = useState('light');
+    const socketRef = useRef(null);
 
     useEffect(() => {
-        // Fetch chat history
+        if (!socketRef.current) {
+            socketRef.current = io(process.env.REACT_APP_SOCKET_URL, {
+                withCredentials: true,
+                transports: ['websocket'],
+                extraHeaders: {
+                    "Access-Control-Allow-Origin": process.env.REACT_APP_CLIENT_URL,
+                },
+            });
+        }
+
         const fetchMessages = async () => {
             try {
                 const response = await axios.get(`${process.env.REACT_APP_API_BASE_URL}/api/chat/history`, {
@@ -27,11 +28,10 @@ function ChatroomComponent() {
                     },
                 });
                 setMessages(response.data);
-                localStorage.setItem('messages', JSON.stringify(response.data)); // Cache messages
-                setIsLoading(false); // Successfully loaded messages
+                localStorage.setItem('messages', JSON.stringify(response.data));
             } catch (error) {
                 console.error('Error fetching messages:', error.message);
-                setIsConnected(false); // Set connection state to false if error occurs
+                setIsConnected(false);
             }
         };
 
@@ -39,72 +39,63 @@ function ChatroomComponent() {
             fetchMessages();
         }
 
-        // Listen for new messages
-        socket.on('chatMessage', (msg) => {
+        socketRef.current.on('newChatMessage', (msg) => {
             setMessages((prevMessages) => {
-                const updatedMessages = prevMessages.map(m => m.localId === msg.localId ? { ...m, status: 'delivered' } : m);
-                localStorage.setItem('messages', JSON.stringify(updatedMessages)); // Cache updated messages
+                const updatedMessages = [...prevMessages, msg];
+                localStorage.setItem('messages', JSON.stringify(updatedMessages));
                 return updatedMessages;
             });
         });
 
-        socket.on('connect', () => {
-            setIsConnected(true);
-            setIsLoading(false);
+        socketRef.current.on('messageStatusUpdate', (update) => {
+            setMessages((prevMessages) => {
+                const updatedMessages = prevMessages.map((m) =>
+                    m.localId === update.localId ? { ...m, status: update.status } : m
+                );
+                localStorage.setItem('messages', JSON.stringify(updatedMessages));
+                return updatedMessages;
+            });
         });
 
-        socket.on('disconnect', () => {
-            setIsConnected(false);
-        });
+        socketRef.current.on('connect', () => setIsConnected(true));
+        socketRef.current.on('disconnect', () => setIsConnected(false));
 
         return () => {
-            socket.disconnect();
+            socketRef.current.disconnect();
         };
     }, [isConnected]);
 
     const handleSendMessage = (e) => {
         e.preventDefault();
         const token = localStorage.getItem('token');
-        const decodedToken = JSON.parse(atob(token.split('.')[1])); // Decode the JWT token
+        const decodedToken = JSON.parse(atob(token.split('.')[1]));
         const userId = decodedToken.id;
 
         const localId = `${new Date().getTime()}-${Math.random()}`;
 
-        // Optimistically update UI with a single tick
         const newMessage = {
             user: {
                 _id: userId,
-                fullName: decodedToken.fullName, // Ensure full name is in the token or manually add it
+                fullName: decodedToken.fullName,
             },
-            message: message,
-            localId: localId, // Temporary local ID
-            status: 'sending' // Initial status is 'sending'
+            message,
+            localId,
+            status: 'sending',
         };
 
         setMessages((prevMessages) => {
             const updatedMessages = [...prevMessages, newMessage];
-            localStorage.setItem('messages', JSON.stringify(updatedMessages)); // Cache updated messages
+            localStorage.setItem('messages', JSON.stringify(updatedMessages));
             return updatedMessages;
         });
 
-        // Send message to the server and handle potential errors
-        socket.emit('chatMessage', { userId, message, localId }, (response) => {
-            if (response.status === 'ok') {
-                // Message delivered successfully, update status
-                setMessages((prevMessages) => {
-                    const updatedMessages = prevMessages.map((m) =>
-                        m.localId === localId ? { ...m, status: 'delivered' } : m
-                    );
-                    localStorage.setItem('messages', JSON.stringify(updatedMessages)); // Cache updated messages
-                    return updatedMessages;
-                });
-            } else {
-                // Server responded with an error, mark as failed
+        socketRef.current.emit('chatMessage', { userId, message, localId }, (response) => {
+            if (response.status !== 'ok') {
                 setMessages((prevMessages) => {
                     const updatedMessages = prevMessages.map((m) =>
                         m.localId === localId ? { ...m, status: 'failed' } : m
                     );
-                    localStorage.setItem('messages', JSON.stringify(updatedMessages)); // Cache updated messages
+                    localStorage.setItem('messages', JSON.stringify(updatedMessages));
                     return updatedMessages;
                 });
             }
@@ -125,18 +116,20 @@ function ChatroomComponent() {
                     Switch to {theme === 'light' ? 'Dark' : 'Light'} Theme
                 </button>
             </div>
-            <div className={`overlay ${isConnected ? 'd-none' : 'd-flex'}`}>
-                <div className="overlay-content">
-                    <div className="spinner-border text-primary" role="status">
-                        <span className="visually-hidden">Loading...</span>
+            {!isConnected && (
+                <div className="overlay d-flex">
+                    <div className="overlay-content">
+                        <div className="spinner-border text-primary" role="status">
+                            <span className="visually-hidden">Loading...</span>
+                        </div>
+                        <p>Connecting to server...</p>
                     </div>
-                    <p>Connecting to server...</p>
                 </div>
-            </div>
-            <div className={`messages p-3 ${isLoading ? 'blur' : ''}`} style={{ height: '70vh', overflowY: 'scroll' }}>
+            )}
+            <div className={`messages p-3 ${!isConnected ? 'blur' : ''}`} style={{ height: '70vh', overflowY: 'scroll' }}>
                 {messages.map((msg, index) => {
                     const token = localStorage.getItem('token');
-                    const decodedToken = JSON.parse(atob(token.split('.')[1])); // Decode the JWT token
+                    const decodedToken = JSON.parse(atob(token.split('.')[1]));
                     const isCurrentUser = msg.user._id === decodedToken.id;
                     return (
                         <div
