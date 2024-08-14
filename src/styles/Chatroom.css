@@ -1,4 +1,3 @@
-/* /src/styles/Chatroom.css */
 .chatroom-container {
     max-width: 600px;
     margin: auto;
@@ -13,6 +12,14 @@
 .messages {
     flex: 1;
     overflow-y: auto;
+}
+
+/* Adjusting text and icon colors for dark theme */
+.bg-dark .small,
+.bg-dark .text-muted,
+.bg-dark .message-status {
+    color: #fff !important;
+    /* Ensure the color is white for dark mode */
 }
 
 .bg-dark .btn-outline-primary {
