@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import Login from "../components/Login";
 import Signup from "../components/Signup";
-import '../Styles/Home.css';
+import '../styles/Home.css';
 
 const Home = () => {
   const [activeForm, setActiveForm] = useState(null);
