@@ -21,7 +21,8 @@ function Login() {
             });
             if(response && response.data.token){
                 localStorage.setItem('token', response.data.token);
-                navigate('/chatroom');
+                localStorage.setItem('userId', response.data.user._id);
+                navigate('/chat');
             }else{
                 alert('Invalid username or password. Please try again.');
             }
@@ -30,6 +31,7 @@ function Login() {
             alert('Login failed.');
         }
     };
+
 
     return (
         <div className="login-container">
