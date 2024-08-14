@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import io from 'socket.io-client';
 import axios from 'axios';
-import '../styles/Chatroom.css';
+import './Chatroom.css';
 
 const socket = io('http://localhost:8080');
 
