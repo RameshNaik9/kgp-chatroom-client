@@ -11,7 +11,7 @@ const ChatroomComponent = () => {
     const [isLoading, setIsLoading] = useState(true);
     const [isConnected, setIsConnected] = useState(true);
     const [theme, setTheme] = useState('light');
-    const messagesEndRef = useRef(null); // Reference to the end of the messages container
+    const messagesEndRef = useRef(null);
 
     const userId = localStorage.getItem('userId');
 
@@ -20,7 +20,7 @@ const ChatroomComponent = () => {
             .then(response => {
                 setMessages(response.data);
                 setIsLoading(false);
-                scrollToBottom(); // Ensure it scrolls to bottom immediately after loading messages
+                scrollToBottom();
             })
             .catch(error => {
                 console.error('Error fetching messages:', error);
@@ -30,7 +30,7 @@ const ChatroomComponent = () => {
         socket.on('newMessage', (newMessage) => {
             setMessages(prevMessages => {
                 const updatedMessages = [...prevMessages, newMessage];
-                scrollToBottom(); // Ensure it scrolls to bottom when a new message is added
+                scrollToBottom();
                 return updatedMessages;
             });
         });
@@ -49,7 +49,6 @@ const ChatroomComponent = () => {
         };
     }, [isConnected]);
 
-    // Scroll to bottom instantly without animation
     const scrollToBottom = () => {
         messagesEndRef.current?.scrollIntoView({ behavior: 'auto' });
     };
@@ -60,8 +59,8 @@ const ChatroomComponent = () => {
         if (message.trim() !== '') {
             socket.emit('sendMessage', { user: userId, message: message }, (response) => {
                 if (response.status === 'ok') {
-                    setMessage(''); // Clear input
-                    scrollToBottom(); // Scroll to bottom after sending the message
+                    setMessage('');
+                    scrollToBottom();
                 } else {
                     alert('Message not sent. Please try again.');
                 }
@@ -113,7 +112,7 @@ const ChatroomComponent = () => {
                         </div>
                     );
                 })}
-                <div ref={messagesEndRef} /> {/* Reference to the end of the messages container */}
+                <div ref={messagesEndRef} />
             </div>
             <form onSubmit={handleSendMessage} className="p-3 border-top">
                 <div className="input-group">
