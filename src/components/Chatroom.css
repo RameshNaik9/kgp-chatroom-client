@@ -11,62 +11,57 @@
 
 .messages {
     flex: 1;
-    overflow-y: auto;
+    overflow-y: scroll;
+    padding: 1rem;
+    position: relative;
 }
 
-/* Adjusting text and icon colors for dark theme */
-.bg-dark .small,
-.bg-dark .text-muted,
-.bg-dark .message-status {
-    color: #fff !important;
-    /* Ensure the color is white for dark mode */
+.message-wrapper {
+    
+    display: flex;
+    width: 10;
+    justify-content: flex-start;
+    position: relative;
 }
 
-.bg-dark .btn-outline-primary {
-    color: #fff;
-    border-color: #fff;
+.message-box {
+    position: relative;
+    display: inline-block;
+    padding: 10px;
+    border-radius: 5px;
+    color: white;
+    word-wrap: break-word;
+    max-width: 50%;
 }
 
-.bg-dark .btn-outline-primary:hover {
-    background-color: #fff;
-    color: #000;
+.message-box textarea {
+    width: auto;
+    max-width: 70%;
+    min-width: 50px;
+    word-wrap: break-word;
 }
 
-.bg-primary {
-    background-color: #007bff !important;
-}
-
-.bg-success {
-    background-color: #28a745 !important;
-}
-
-.message-status {
-    font-size: 16px;
-    margin-left: 10px;
-}
-
-.text-danger {
-    color: red;
-    margin-top: 5px;
-}
-
-.overlay {
+.message-box .dropdown {
     position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(255, 255, 255, 0.8);
-    display: none;
-    align-items: center;
-    justify-content: center;
-    z-index: 10;
+    right: -30px; /* Adjust based on your padding */
+    top: 50%;
+    transform: translateY(-30%);
+    transform: translateX(25%);
+    margin-left: 0px; /* Space between text and dropdown */
+    z-index: 50;
 }
 
-.overlay-content {
-    text-align: center;
+.message-box .dropdown-menu {
+    position: absolute;
+    min-width: auto;
+    width: auto;
+    z-index: 55;
 }
 
-.blur {
-    filter: blur(4px);
+.message-box.bg-primary {
+    background-color: #007bff;
+}
+
+.message-box.bg-success {
+    background-color: #28a745;
 }
