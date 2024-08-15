@@ -1,7 +1,7 @@
-import React, { useState, useEffect, useRef } from "react";
-import io from "socket.io-client";
-import axios from "axios";
-import '../Styles/Chatroom.css';
+import React, { useState, useEffect, useRef } from 'react';
+import io from 'socket.io-client';
+import axios from 'axios';
+import './Chatroom.css';
 
 const socket = io("http://localhost:8080");
 
@@ -25,6 +25,7 @@ const ChatComponent = () => {
                 setMessages(response.data);
                 setIsLoading(false);
                 scrollToBottom();
+                scrollToBottom();
             })
             .catch((error) => {
                 console.error("Error fetching messages:", error);
@@ -34,6 +35,7 @@ const ChatComponent = () => {
         socket.on("newMessage", (newMessage) => {
             setMessages((prevMessages) => {
                 const updatedMessages = [...prevMessages, newMessage];
+                scrollToBottom();
                 scrollToBottom();
                 return updatedMessages;
             });
